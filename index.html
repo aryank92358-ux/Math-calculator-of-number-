@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Divisibility Finder (2 & 3 Digit)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      align-self: flex-start;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #38bdf8;
+    }
+
+    .sub {
+      margin: 0 0 18px;
+      font-size: 13.5px;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="number"] {
+      flex: 1;
+      padding: 13px 14px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 1.5px solid #475569;
+      background: #0f172a;
+      color: #f8fafc;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: #38bdf8;
+    }
+
+    button {
+      padding: 13px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      background: #22c55e;
+      color: #052e16;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .quick-picks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      background: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip:hover {
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .error {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid #f43f5e;
+      color: #fda4af;
+      font-size: 13.5px;
+      display: none;
+    }
+
+    .result {
+      margin-top: 18px;
+      display: none;
+    }
+
+    .summary {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .num-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .prime {
+      background: rgba(56, 189, 248, 0.18);
+      color: #7dd3fc;
+      border: 1px solid #38bdf8;
+    }
+
+    .composite {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+      border: 1px solid #22c55e;
+    }
+
+    .meta {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .sec-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+      margin: 14px 0 8px;
+    }
+
+    .divisors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .div-pill {
+      background: #0f172a;
+      border: 1px solid #22c55e;
+      color: #bbf7d0;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .rule-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .rule-box.yes {
+      border-color: #22c55e;
+      color: #86efac;
+    }
+
+    .rule-box.no {
+      color: #64748b;
+    }
+
+    .rule-num {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Divisibility Checker</h1>
+    <p class="sub">2 ya 3 digit ka koi number (10 se 999) daalein aur dekhein woh kin numbers se poora divide hota hai.</p>
+
+    <div class="input-row">
+      <input type="number" id="numInput" min="10" max="999" placeholder="Ex: 144" />
+      <button id="checkBtn">Check</button>
+    </div>
+
+    <div class="quick-picks">
+      <span class="chip" data-val="24">24</span>
+      <span class="chip" data-val="37">37</span>
+      <span class="chip" data-val="120">120</span>
+      <span class="chip" data-val="144">144</span>
+      <span class="chip" data-val="365">365</span>
+      <span class="chip" data-val="997">997</span>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+
+    <div class="result" id="resultBox">
+      <div class="summary">
+        <div class="summary-top">
+          <div class="num-title" id="resTitle">Number: 24</div>
+          <span class="tag composite" id="resType">Composite</span>
+        </div>
+        <div class="meta" id="resMeta"></div>
+      </div>
+
+      <div class="sec-title">In numbers se poora divide hota hai (All Divisors)</div>
+      <div class="divisors" id="divList"></div>
+
+      <div class="sec-title">Single-digit check (2 to 9)</div>
+      <div class="rules-grid" id="singleGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    const numInput = document.getElementById("numInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const errorBox = document.getElementById("errorBox");
+    const resultBox = document.getElementById("resultBox");
+    const resTitle = document.getElementById("resTitle");
+    const resType = document.getElementById("resType");
+    const resMeta = document.getElementById("resMeta");
+    const divList = document.getElementById("divList");
+    const singleGrid = document.getElementById("singleGrid");
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+      resultBox.style.display = "none";
+    }
+
+    function getDivisors(n) {
+      const small = [];
+      const large = [];
+      for (let i = 1; i * i <= n; i++) {
+        if (n % i === 0) {
+          small.push(i);
+          if (i !== n / i) {
+            large.push(n / i);
+          }
+        }
+      }
+      large.reverse();
+      return small.concat(large);
+    }
+
+    function checkNumber(rawVal) {
+      const n = Number(rawVal);
+      if (!Number.isInteger(n) || n < 10 || n > 999) {
+        showError("Kripya sirf 2 ya 3 digit ka number daalein (10 se 999 ke beech).");
+        return;
+      }
+
+      errorBox.style.display = "none";
+      const divisors = getDivisors(n);
+      const isPrime = divisors.length === 2;
+      const parity = n % 2 === 0 ? "Even" : "Odd";
+
+      resTitle.textContent = `Number: ${n}`;
+      resType.textContent = isPrime ? "Prime Number" : "Composite Number";
+      resType.className = `tag ${isPrime ? "prime" : "composite"}`;
+
+      resMeta.innerHTML = isPrime
+        ? `Yeh <strong>${parity}</strong> aur <strong>Prime</strong> number hai — sirf <strong>1</strong> aur <strong>${n}</strong> se divide hota hai.`
+        : `Yeh <strong>${parity}</strong> number hai aur iske kul <strong>${divisors.length}</strong> divisors hain.`;
+
+      divList.innerHTML = divisors
+        .map((d) => `<span class="div-pill">${d}</span>`)
+        .join("");
+
+      const singleNums = [2, 3, 4, 5, 6, 7, 8, 9];
+      singleGrid.innerHTML = singleNums
+        .map((d) => {
+          const ok = n % d === 0;
+          return `
+            <div class="rule-box ${ok ? "yes" : "no"}">
+              <span class="rule-num">${d}</span>
+              <span>${ok ? "Yes" : "No"}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      resultBox.style.display = "block";
+    }
+
+    checkBtn.addEventListener("click", () => checkNumber(numInput.value.trim()));
+
+    numInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkNumber(numInput.value.trim());
+      }
+    });
+
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const val = chip.getAttribute("data-val");
+        numInput.value = val;
+        checkNumber(val);
+      });
+    });
+
+    // Default example on load
+    numInput.value = "144";
+    checkNumber("144");
+  </script>
+</body>
+</html>
